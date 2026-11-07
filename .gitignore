@@ -9,10 +9,9 @@ apps/*
 automacoes/*.json
 atendente/
 backups/
-# dados/: só a memória, as tarefas e as anotações vão para o backup (api.token, agenda, logs e testes ficam fora)
+# dados/: vão a cópia segura da memória e das tarefas (dados/copia-backup, feita pelo SQLite antes do backup) e as anotações
 dados/*
-!dados/memoria.db
-!dados/tarefas.db
+!dados/copia-backup/
 !dados/PROGRESSO.md
 !dados/instalados.md
 # config.toml e rotinas/ ENTRAM no backup (conferido em 06/11/2026: sem chaves; as chaves ficam nas variáveis do Windows)
