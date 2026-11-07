@@ -1,0 +1,9 @@
+{
+  "nome": "viacep",
+  "descricao": "Endereço por CEP (API pública brasileira, sem chave)",
+  "base_url": "https://viacep.com.br",
+  "auth": { "tipo": "nenhum" },
+  "endpoints": [
+    { "nome": "buscar-cep", "metodo": "GET", "caminho": "/ws/{cep}/json/", "descricao": "Devolve rua, bairro, cidade e UF de um CEP (8 dígitos)" }
+  ]
+}

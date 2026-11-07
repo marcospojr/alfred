@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>__NOME__</title>
+<style>
+:root{--bg:#000;--tx:rgba(255,255,255,.92);--mu:rgba(255,255,255,.55);--bd:rgba(255,255,255,.12);--ac:#ff6f37;--ok:#3ecf7a}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(60% 50% at 50% 0,rgba(255,111,55,.14),transparent 70%),#000;color:var(--tx);font:15px/1.45 -apple-system,"Segoe UI",Inter,sans-serif;height:100dvh;display:grid;grid-template-rows:auto 1fr auto}
+header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--bd)}
+h1{font-size:18px;letter-spacing:.2em;margin:0;text-transform:uppercase}.chip{font:11px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.1em;border:1px solid var(--bd);border-radius:8px;padding:3px 8px;color:var(--mu)}
+.chip.on{color:var(--ok);border-color:rgba(62,207,122,.5)}body{grid-template-columns:minmax(0,1fr)}header>*{min-width:0}.chip{max-width:100%;overflow-wrap:anywhere;white-space:normal}.chip.alerta{color:#e8b339;border-color:rgba(232,179,57,.6)}.chip.erro{color:#ef5f5f;border-color:rgba(239,95,95,.6)}.sp{flex:1}select,button{font:inherit;color:var(--tx);background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:10px;padding:7px 12px;cursor:pointer}
+main{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:12px;padding:12px 16px;min-height:0}@media(max-width:820px){main{grid-template-columns:1fr}#log{display:none}}
+.col{border:1px solid var(--bd);border-radius:16px;background:rgba(255,255,255,.03);display:flex;flex-direction:column;min-height:0}.col h2{font:11px ui-monospace,Menlo,monospace;letter-spacing:.2em;color:var(--mu);margin:0;padding:10px 14px;border-bottom:1px solid var(--bd)}
+.rol{overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;flex:1}.b{max-width:88%;padding:9px 13px;border-radius:14px;white-space:pre-wrap;overflow-wrap:anywhere}.me{align-self:flex-end;background:rgba(255,255,255,.08)}.al{align-self:flex-start;background:rgba(255,111,55,.12);border:1px solid rgba(255,111,55,.3)}
+.e{display:grid;grid-template-columns:62px 1fr;gap:8px;border-left:2px solid rgba(255,255,255,.2);padding-left:8px;font-size:13px}.e time{font:11px ui-monospace,monospace;color:var(--mu)}.e small{display:block;color:var(--mu);font:11px ui-monospace,monospace;overflow-wrap:anywhere}
+.e.f{border-color:var(--ac)}.e.f b{color:#ff8a5c}.e.r{border-color:var(--ok)}.e.x{border-color:#ff5c5c}
+.conf{border:1px solid var(--ac);background:rgba(255,111,55,.12);border-radius:14px;padding:12px;display:grid;gap:10px;align-self:stretch}.conf div{display:flex;gap:8px;flex-wrap:wrap}.conf .s{background:var(--ac);color:#140700;border-color:var(--ac);font-weight:600}
+form{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--bd)}form input{min-width:0;flex:1}input{flex:1;font:inherit;font-size:16px;color:var(--tx);background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:999px;padding:11px 16px;outline:0}input:focus{border-color:var(--ac)}
+.go{background:var(--ac);color:#140700;border-color:var(--ac);font-weight:600}.mic.rec{background:#ff5c5c;border-color:#ff5c5c}
+#painel{position:fixed;inset:60px 16px 16px auto;width:min(420px,94vw);z-index:20;background:#0d0d0d;border:1px solid var(--ac);border-radius:16px;padding:14px;overflow:auto;box-shadow:0 20px 60px #000}#painel[hidden]{display:none}#fp{float:right;font-size:20px;padding:2px 10px}#pc h3{font:11px ui-monospace,monospace;letter-spacing:.18em;color:var(--mu);margin:16px 0 6px}#pc div.it{border-top:1px solid var(--bd);padding:8px 0;font-size:13px}#pc a{color:var(--ac)}#pc small{display:block;color:var(--mu)}</style></head><body>
+<header><h1>__NOME__</h1><span class="chip" id="cc">…</span><span class="chip" id="cg"></span><span class="chip" id="cq" title="contagem do Alfred; oficial em console.groq.com/settings/limits"></span><span class="sp"></span>
+<label class="chip">modo <select id="modo"><option>observar</option><option selected>supervisionado</option><option>liberado</option></select></label>
+<button id="pn" title="Automações, apps, APIs e MCP">⚙ painel</button><button id="voz" title="Falar as respostas em voz alta">🔈 voz</button><button id="parar" title="Parar tudo agora">■ parar</button></header>
+<div id="painel" hidden><button id="fp" aria-label="Fechar">×</button><div id="pc"></div></div>
+<main><section class="col"><h2>CONVERSA</h2><div class="rol" id="chat"></div></section><section class="col" id="log"><h2>ATIVIDADE AO VIVO</h2><div class="rol" id="ev"></div></section></main>
+<form id="f"><button type="button" class="mic" id="mic" title="Segure para falar">🎤</button><input id="t" placeholder="Peça algo ao __NOME__…" autocomplete="off" maxlength="4000" autofocus><button class="go">Enviar</button></form>
+<script>
+const T="__TOKEN__",$=s=>document.querySelector(s),H={"x-alfred":T,"content-type":"application/json"};let falar=false,ultimo=0;
+const api=(p,b)=>fetch(p,{method:"POST",headers:H,body:JSON.stringify(b||{})}).then(async r=>{if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.detail||r.status)}return r.json()});
+function bolha(t,c){const d=document.createElement("div");d.className="b "+c;d.textContent=t;$("#chat").append(d);d.scrollIntoView({block:"end"});return d}
+function ev(cls,titulo,det,t){const d=document.createElement("div");d.className="e "+cls;d.innerHTML="<time></time><div><b></b><small></small></div>";d.querySelector("time").textContent=t||"";d.querySelector("b").textContent=titulo;d.querySelector("small").textContent=det||"";$("#ev").append(d);d.scrollIntoView({block:"end"})}
+function confirmar(e){const d=document.createElement("div");d.className="conf";d.innerHTML="<b></b><div></div>";d.querySelector("b").textContent="Posso fazer isto? "+e.frase;
+ const bt=(rot,dec,cl)=>{const b=document.createElement("button");b.textContent=rot;if(cl)b.className=cl;b.onclick=()=>{api("/api/confirmar",{id:e.id,decisao:dec});d.remove()};d.lastChild.append(b)};
+ bt("Sim","sim","s");if(e.risco==="A")bt("Sempre para isto","sempre");bt("Não","nao");$("#chat").append(d);d.scrollIntoView({block:"end"})}
+function tratar(e){ultimo=e.n;
+ if(e.tipo==="usuario")bolha(e.texto,"me");
+ else if(e.tipo==="resposta"){bolha(e.texto,"al");if(falar&&"speechSynthesis" in window){speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(e.texto))}}
+ else if(e.tipo==="ferramenta")ev("f","▸ "+e.nome,JSON.stringify(e.args),e.t);
+ else if(e.tipo==="resultado")ev(e.ok?"r":"x",(e.ok?"✓ ":"✗ ")+e.nome,e.resumo,e.t);
+ else if(e.tipo==="confirmar")confirmar(e);
+ else if(e.tipo==="uso")ev("","uso",`${e.entrada} entrada · ${e.saida} saída · US$ ${e.usd}`,e.t);
+ else if(e.tipo==="aviso")bolha("🔔 "+e.texto,"al");else if(e.tipo==="automacao")ev("f","automação "+e.nome,"rodando ("+e.origem+")",e.t);else if(e.tipo==="automacao_fim")ev(e.ok?"r":"x","automação "+e.nome+(e.ok?" concluída":" falhou"),e.resumo,e.t);else if(e.tipo==="rotina")ev("f","rotina "+e.nome,"rodando sozinha (só leitura)",e.t);
+ else if(e.tipo==="parado")ev("x","parado por você","",e.t);
+ else if(e.tipo==="erro")bolha("Erro: "+e.texto,"al")}
+function conectar(){const es=new EventSource(`/api/eventos?t=${T}&desde=${ultimo}`);es.onmessage=m=>tratar(JSON.parse(m.data));es.onerror=()=>{es.close();setTimeout(conectar,1500)}}
+function cota(c){const el=$("#cq");const ms=Object.entries((c&&c.modelos)||{});if(!ms.length){el.textContent="cota: sem uso hoje";el.className="chip";return}
+const n=x=>Number(x).toLocaleString("pt-BR");let pior=0;el.textContent=ms.map(([nome,m])=>{const p=m.tokens_limite_dia?Math.round(100*m.tokens/m.tokens_limite_dia):null;if(p!==null)pior=Math.max(pior,p);
+let t=`cota ${p!==null?p+"% · ":""}${n(m.tokens)}${m.tokens_limite_dia?"/"+n(m.tokens_limite_dia):""} tokens`;if(m.pedidos_restantes_dia!=null)t+=` · ${n(m.pedidos_restantes_dia)} pedidos`;if(m.tokens_livres_minuto!=null)t+=` · minuto ${n(m.tokens_livres_minuto)}`;return t}).join(" | ");
+el.className="chip"+(pior>=95?" erro":pior>=80?" alerta":" on")}
+async function estado(){try{const r=await fetch("/api/estado",{headers:H});const s=await r.json();$("#cc").textContent=s.cerebro_pronto?`${s.provedor} · ${s.modelo}`:"sem chave do cérebro";$("#cc").className="chip"+(s.cerebro_pronto?" on":"");$("#cg").textContent=`gasto hoje US$ ${s.gasto_hoje} / ${s.limite}`;cota(s.cota);if(!window._m){$("#modo").value=s.modo;window._m=1}}catch(e){}}
+$("#f").onsubmit=e=>{e.preventDefault();const t=$("#t").value.trim();if(!t)return;$("#t").value="";api("/api/mensagem",{texto:t,modo:$("#modo").value}).catch(x=>bolha("Não enviei: "+x.message,"al"))};
+$("#parar").onclick=()=>api("/api/parar");$("#voz").onclick=()=>{falar=!falar;$("#voz").textContent=falar?"🔊 voz ligada":"🔈 voz"};
+let rec,pedacos=[];$("#mic").onclick=async()=>{if(rec&&rec.state==="recording"){rec.stop();return}try{const s=await navigator.mediaDevices.getUserMedia({audio:true});rec=new MediaRecorder(s);pedacos=[];rec.ondataavailable=e=>pedacos.push(e.data);
+ rec.onstop=async()=>{s.getTracks().forEach(t=>t.stop());$("#mic").classList.remove("rec");const fd=new FormData();fd.append("arquivo",new Blob(pedacos,{type:rec.mimeType}),"audio.webm");try{const r=await fetch("/api/transcrever",{method:"POST",headers:{"x-alfred":T},body:fd});const j=await r.json();if(!r.ok)throw new Error(j.detail);$("#t").value=j.texto;$("#t").focus()}catch(x){bolha("Voz: "+x.message,"al")}};
+ rec.start();$("#mic").classList.add("rec")}catch(x){bolha("Não consegui abrir o microfone: "+x.message,"al")}};
+async function painel(){const r=await fetch("/api/painel",{headers:H});const p=await r.json();const c=$("#pc");c.innerHTML="";const sec=(t,l,f)=>{const h=document.createElement("h3");h.textContent=t;c.append(h);if(!l.length){const d=document.createElement("div");d.className="it";d.textContent="nada ainda: peça ao Alfred para criar";c.append(d)}l.forEach(x=>{const d=document.createElement("div");d.className="it";f(d,x);c.append(d)})};
+ sec("AUTOMAÇÕES",p.automacoes,(d,a)=>{d.innerHTML="<b></b> <small></small>";d.querySelector("b").textContent=(a.ativa?"● ":"○ ")+a.nome;d.querySelector("small").textContent=a.resumo;const b=document.createElement("button");b.textContent="rodar agora";b.onclick=()=>api("/api/automacao/rodar",{nome:a.nome});d.append(b)});
+ sec("APPS",p.apps,(d,a)=>{const l=document.createElement("a");l.href=a.url;l.target="_blank";l.textContent=a.titulo+" ("+a.nome+")";d.append(l)});
+ sec("APIS CONECTADAS",p.conectores,(d,a)=>{d.textContent=a.nome+": "+a.endpoints.join(", ")});
+ sec("SERVIDORES MCP",p.mcp,(d,a)=>{d.textContent=(a.conectado?"● ":"○ ")+a.nome+(a.erro?" — "+a.erro:"")})}
+$("#pn").onclick=()=>{$("#painel").hidden=!$("#painel").hidden;if(!$("#painel").hidden)painel()};$("#fp").onclick=()=>$("#painel").hidden=true;
+conectar();estado();setInterval(estado,5000);
+</script></body></html>

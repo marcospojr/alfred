@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+httpx
+keyring
+send2trash
+python-multipart
+icalendar
+recurring-ical-events

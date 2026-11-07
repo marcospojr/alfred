@@ -1,0 +1,6 @@
+# Roda sozinha, em modo "observar" (só lê). Troque ativa para true e ajuste a hora.
+ativa = false
+# telegram = true    # com o Telegram ligado, o resultado chega lá (padrão: avisar_rotinas do config)
+hora = "08:00"
+dias = ["seg", "ter", "qua", "qui", "sex"]
+pedido = "Me dê o bom-dia: compromissos de hoje, e o que mais precisa da minha atenção. Seja breve."

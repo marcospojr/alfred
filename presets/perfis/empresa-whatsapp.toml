@@ -1,0 +1,7 @@
+# Perfil de empresa com atendente de WhatsApp. Copie os valores para config.toml.
+modo = "supervisionado"
+tom = "profissional e simpático"
+pastas = ["~/Alfred-Arquivos"]
+[whatsapp]
+ativo = true
+porta = 8787

@@ -1,0 +1,9 @@
+{
+  "name": "alfred-whatsapp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Ponte local do WhatsApp para o Alfred + atendente de clientes (opcional)",
+  "scripts": { "ponte": "node whatsapp.js", "atendente": "MODO=atendente node whatsapp.js", "test": "node --test testes.js" },
+  "engines": { "node": ">=22.13" },
+  "dependencies": { "qrcode-terminal": "^0.12.0", "whatsapp-web.js": "latest" }
+}

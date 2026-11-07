@@ -1,0 +1,10 @@
+{
+  "nome": "orcamento-recebido",
+  "descricao": "Encadeamento por evento: quando outra automação (ou um webhook) emitir 'orcamento-novo', esta registra e avisa. Veja docs/AUTOMACOES.md.",
+  "ativa": false,
+  "gatilho": { "tipo": "evento", "nome": "orcamento-novo" },
+  "passos": [
+    { "ferramenta": "lembrar", "args": { "chave": "último orçamento pedido", "valor": "{entrada}" } },
+    { "avisar": "Novo pedido de orçamento: {entrada}" }
+  ]
+}

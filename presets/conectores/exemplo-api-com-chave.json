@@ -1,0 +1,11 @@
+{
+  "nome": "minha-api",
+  "descricao": "MODELO: copie, troque a URL e os endpoints. A chave fica no cofre: python -m alfred chave minha-api-chave",
+  "base_url": "https://api.exemplo.com",
+  "auth": { "tipo": "bearer", "segredo": "minha-api-chave" },
+  "endpoints": [
+    { "nome": "listar-clientes", "metodo": "GET", "caminho": "/v1/clientes", "descricao": "lista clientes (leitura)" },
+    { "nome": "criar-cliente", "metodo": "POST", "caminho": "/v1/clientes", "risco": "A", "descricao": "cria um cliente: parametros nome, email" },
+    { "nome": "cobrar", "metodo": "POST", "caminho": "/v1/cobrancas", "risco": "R", "descricao": "cria uma cobrança (gasta/recebe dinheiro): valor, cliente_id" }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "nome": "open-meteo",
+  "descricao": "Previsão do tempo (API pública, sem chave)",
+  "base_url": "https://api.open-meteo.com",
+  "auth": { "tipo": "nenhum" },
+  "endpoints": [
+    { "nome": "previsao", "metodo": "GET", "caminho": "/v1/forecast", "descricao": "parâmetros: latitude, longitude, current=temperature_2m,wind_speed_10m, timezone=auto" }
+  ]
+}

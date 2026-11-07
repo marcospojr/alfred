@@ -1,0 +1,4 @@
+# Opcionais: controle de mouse/teclado e navegador próprio do assistente
+pyautogui
+pillow
+playwright

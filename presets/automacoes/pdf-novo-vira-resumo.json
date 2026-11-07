@@ -1,0 +1,12 @@
+{
+  "nome": "pdf-novo-vira-resumo",
+  "descricao": "Quando cair um PDF na pasta de entrada, lê e guarda um resumo ao lado. Sem nada vermelho.",
+  "ativa": false,
+  "gatilho": { "tipo": "pasta", "caminho": "~/Alfred-Arquivos/entrada", "padrao": "*.txt" },
+  "passos": [
+    { "ferramenta": "ler_arquivo", "args": { "caminho": "{entrada}" }, "guardar_como": "texto" },
+    { "pedido": "Resuma em 5 linhas, em português: {texto}", "guardar_como": "resumo" },
+    { "ferramenta": "escrever_arquivo", "args": { "caminho": "resumos/resumo-novo.txt", "conteudo": "{resumo}", "sobrescrever": true } },
+    { "avisar": "Resumo pronto para {entrada}" }
+  ]
+}

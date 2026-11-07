@@ -1,0 +1,5 @@
+# Relatório diário do atendente de WhatsApp (precisa de [whatsapp] ativo = true e do atendente rodando).
+ativa = false
+hora = "18:30"
+dias = ["seg", "ter", "qua", "qui", "sex"]
+pedido = "Use atendimento_relatorio com dias=1 e me resuma: números do dia, perguntas que mais viraram chamado humano, e o que eu deveria acrescentar à base do atendente. Não altere nada."

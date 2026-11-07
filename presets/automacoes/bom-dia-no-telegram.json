@@ -1,0 +1,12 @@
+{
+  "nome": "bom-dia-no-telegram",
+  "descricao": "Todo dia útil às 8h: junta agenda e e-mails e manda o resumo para você no Telegram.",
+  "ativa": false,
+  "gatilho": { "tipo": "horario", "hora": "08:00", "dias": ["seg", "ter", "qua", "qui", "sex"] },
+  "passos": [
+    { "ferramenta": "agenda_hoje", "args": { "dias": 1 }, "guardar_como": "agenda" },
+    { "pedido": "Escreva um bom-dia curto (6 linhas) usando esta agenda: {agenda}", "guardar_como": "resumo" },
+    { "ferramenta": "telegram_avisar", "args": { "texto": "{resumo}" } }
+  ],
+  "permite": []
+}

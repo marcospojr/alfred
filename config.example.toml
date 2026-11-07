@@ -1,0 +1,50 @@
+# Copie para config.toml e ajuste. Nenhum segredo aqui: chaves ficam no cofre do sistema.
+nome = "Alfred"
+pessoa = ""                      # seu nome
+idioma = "pt-BR"
+tom = "direto e cordial"
+modo = "supervisionado"          # observar | supervisionado | liberado
+provedor = "groq"                # groq | openai | anthropic | gemini | openrouter | xai | ollama
+modelo = ""                      # vazio = padrão do provedor; para OpenAI/Gemini/xAI/OpenRouter/Ollama preencha (veja a lista do dia)
+porta = 8765
+limite_diario_usd = 2.0
+
+# Grupos de ferramentas sempre ligados (economiza tokens quando vazio). Com cérebro pago/rápido, pode ligar tudo:
+# grupos_sempre = ["web", "comunicacao", "criar", "integracoes", "controle"]
+grupos_sempre = []
+
+# Pastas onde o Alfred pode ler e escrever (nada fora delas). A primeira é a pasta de trabalho.
+pastas = ["~/Alfred-Arquivos"]
+
+# Comandos que ele pode rodar (sempre com a sua confirmação, sem encadear)
+comandos_permitidos = ["git", "python", "python3", "node", "npm", "ls", "dir", "whoami", "date"]
+
+# Agenda: caminho de um .ics exportado (Google/Outlook/Apple). No Mac, vazio lê o app Calendário.
+agenda_ics = ""
+agendas = ["agenda"]             # várias agendas do Google: uma chave no cofre por agenda (agenda, agenda-trabalho...)
+
+[claude_code]
+limite_dia = 10                  # máximo de chamadas ao Claude Code por dia (uso individual da assinatura)
+tempo_max_s = 600                # tempo máximo de cada tarefa, em segundos
+consulta_sem_perguntar = false   # true = claude_consultar roda sem pedir o sim, SÓ quando é você pedindo (tela/Telegram). claude_tarefa sempre pergunta.
+
+[tailscale]
+ativo = false                    # painel pelo Tailscale (tailscale serve), só para a conta do dono
+endereco = ""                    # ex.: beaesthetic.tail1234.ts.net  (aparece no 'tailscale serve status')
+dono = ""                        # a conta do Tailscale que pode abrir o painel (seu e-mail de login no Tailscale)
+
+[telegram]
+ativo = false                    # ligue depois de criar o bot no @BotFather e rodar: python -m alfred chave telegram
+dono_id = 0                      # seu ID do Telegram (o bot te mostra na primeira mensagem). Só ele é atendido.
+avisar_rotinas = true            # o resultado das rotinas (bom-dia etc.) chega no Telegram
+
+[whatsapp]
+ativo = false                    # ligue depois de configurar canais/whatsapp
+porta = 8787
+
+[email]
+ativo = false                    # ligue e rode: python -m alfred chave email  (use senha de app)
+imap = "imap.gmail.com"
+smtp = "smtp.gmail.com"
+usuario = ""                     # seu e-mail completo
+permitir_envio = false           # false = o Alfred só lê e salva rascunhos; quem envia é você pelo Gmail

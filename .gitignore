@@ -1,0 +1,18 @@
+# Fora do backup: segredos, ambiente, caches e logs
+.venv/
+__pycache__/
+node_modules/
+.env*
+mcp.json
+conectores/*.json
+apps/*
+automacoes/*.json
+atendente/
+backups/
+# dados/: só a memória, as tarefas e as anotações vão para o backup (api.token, agenda, logs e testes ficam fora)
+dados/*
+!dados/memoria.db
+!dados/tarefas.db
+!dados/PROGRESSO.md
+!dados/instalados.md
+# config.toml e rotinas/ ENTRAM no backup (conferido em 06/11/2026: sem chaves; as chaves ficam nas variáveis do Windows)

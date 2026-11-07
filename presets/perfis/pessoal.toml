@@ -1,0 +1,8 @@
+# Perfil pessoal: tudo local, supervisionado, só pastas suas. Copie os valores para config.toml.
+modo = "supervisionado"
+tom = "direto e cordial"
+pastas = ["~/Alfred-Arquivos"]
+[whatsapp]
+ativo = false
+[email]
+ativo = false
