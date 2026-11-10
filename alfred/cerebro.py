@@ -22,7 +22,16 @@ PROVEDORES = {
     "xai":        {"tipo": "openai", "base": "https://api.x.ai/v1", "modelo": "", "chave": "xai"},
     "ollama":     {"tipo": "openai", "base": "http://localhost:11434/v1", "modelo": "", "chave": None},
     "anthropic":  {"tipo": "anthropic", "base": "https://api.anthropic.com/v1", "modelo": "claude-sonnet-5-5", "chave": "anthropic"},
+    # Claude pela assinatura (Claude Code em modo -p, sem ferramentas próprias): sem chave e sem custo por uso; se falhar, cai no Groq.
+    "claude-code": {"tipo": "claudecode", "base": "", "modelo": "sonnet", "chave": None, "socorro": "groq"},
 }
+# Formato que o Claude Code devolve: ou pede ferramentas do Alfred, ou dá a resposta final.
+ESQUEMA_CC = {"type": "object", "properties": {
+    "responder": {"type": "string"},
+    "ferramentas": {"type": "array", "items": {"type": "object", "properties": {"nome": {"type": "string"}, "args": {"type": "object"}}, "required": ["nome", "args"]}}}}
+REGRA_CC = ("\n\n## Como responder (obrigatório)\nVocê não executa nada sozinho: as ferramentas abaixo são do Alfred. Para usar, preencha 'ferramentas' "
+            "com [{nome, args}] e deixe 'responder' vazio; o Alfred roda e devolve o resultado na conversa. Com tudo em mãos, preencha só 'responder' "
+            "com o texto final para a pessoa. Use só ferramentas da lista, com os argumentos do esquema.\n\n## Ferramentas do Alfred\n")
 # US$ por 1 milhão de tokens (entrada, saída): Anthropic em 06/out/2026. Outros: 0 = desconhecido/grátis.
 PRECOS = {"claude-sonnet-5-5": (2.0, 10.0), "claude-haiku-5-5": (0.10, 0.50), "claude-opus-5-5": (4.0, 20.0), "claude-fable-5-1": (10.0, 50.0)}
 
@@ -100,6 +109,15 @@ class Provedor:
         raise ErroCerebro(f"o provedor não respondeu ({ultimo})")
 
     def completar(self, sistema: str, mensagens: list, ferramentas: list) -> Resposta:
+        if self.tipo == "claudecode":
+            try:
+                return self._claude_code(sistema, mensagens, ferramentas)
+            except ErroCerebro as e:
+                socorro = PROVEDORES[self.nome].get("socorro")
+                if not socorro or not segredos.obter(PROVEDORES[socorro]["chave"]):
+                    raise
+                print(f"[cérebro] Claude Code falhou ({e}); respondendo pelo {socorro}", flush=True)
+                return Provedor(socorro).completar(sistema, mensagens, ferramentas)
         if self.tipo == "anthropic":
             return self._anthropic(sistema, mensagens, ferramentas)
         return self._openai(sistema, mensagens, ferramentas)
@@ -156,6 +174,49 @@ class Provedor:
             texto = texto or "Não posso ajudar com isso."
         uso = j.get("usage") or {}
         return Resposta(texto.strip(), chamadas, uso.get("input_tokens", 0), uso.get("output_tokens", 0))
+
+    # ---------------- Claude Code (assinatura) ----------------
+    def _claude_code(self, sistema, mensagens, ferramentas) -> Resposta:
+        import subprocess, sys
+        from pathlib import Path
+        from .tools.delegar import achar_claude
+        claude = achar_claude()
+        if not claude:
+            raise ErroCerebro("não achei o Claude Code neste PC (comando claude)")
+        linhas = []
+        for m in mensagens:
+            if m["role"] == "user":
+                linhas.append(f"PESSOA: {m['content']}")
+            elif m["role"] == "assistant":
+                if m.get("content"):
+                    linhas.append(f"ALFRED: {m['content']}")
+                for c in m.get("tool_calls") or []:
+                    linhas.append(f"ALFRED PEDIU A FERRAMENTA {c['function']['name']} com {c['function']['arguments']}")
+            elif m["role"] == "tool":
+                linhas.append(f"RESULTADO DA FERRAMENTA: {m['content']}")
+        catalogo = json.dumps([{"nome": f["nome"], "descricao": f["descricao"], "args": _enxuto(f["parametros"])} for f in ferramentas], ensure_ascii=False)
+        pasta = Path(__file__).resolve().parent.parent / "dados" / "claude-code"     # pasta neutra: sem CLAUDE.md de projeto
+        pasta.mkdir(parents=True, exist_ok=True)
+        arq_sis = pasta / "sistema.txt"
+        arq_sis.write_text(sistema + REGRA_CC + catalogo, encoding="utf-8")
+        cmd = [claude, "-p", "--output-format", "json", "--json-schema", json.dumps(ESQUEMA_CC), "--tools", "", "--strict-mcp-config",
+               "--setting-sources", "", "--no-session-persistence", "--model", self.modelo, "--system-prompt-file", str(arq_sis)]
+        try:
+            p = subprocess.run(cmd, input="\n\n".join(linhas).encode("utf-8"), capture_output=True, timeout=180, cwd=pasta,
+                               creationflags=subprocess.CREATE_NO_WINDOW if sys.platform.startswith("win") else 0)
+        except subprocess.TimeoutExpired:
+            raise ErroCerebro("o Claude Code demorou mais de 3 minutos")
+        try:
+            j = json.loads(p.stdout.decode("utf-8", "replace"))
+        except json.JSONDecodeError:
+            raise ErroCerebro(f"o Claude Code não respondeu ({p.returncode}: {p.stderr.decode('utf-8', 'replace')[:200]})")
+        if j.get("is_error"):
+            raise ErroCerebro(f"o Claude Code deu erro: {str(j.get('result') or j.get('api_error_status'))[:200]}")
+        saida = j.get("structured_output") or {}
+        chamadas = [{"id": f"cc{i}", "nome": c["nome"], "args": c.get("args") or {}} for i, c in enumerate(saida.get("ferramentas") or [])]
+        uso = j.get("usage") or {}
+        entrada = uso.get("input_tokens", 0) + uso.get("cache_creation_input_tokens", 0) + uso.get("cache_read_input_tokens", 0)
+        return Resposta("" if chamadas else (saida.get("responder") or j.get("result") or "").strip(), chamadas, entrada, uso.get("output_tokens", 0))
 
     def custo(self, r: Resposta) -> float:
         pe, ps = PRECOS.get(self.modelo, (0.0, 0.0))

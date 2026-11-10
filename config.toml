@@ -4,7 +4,7 @@ pessoa = "Marcos"
 idioma = "pt-BR"
 tom = "direto e cordial"
 modo = "supervisionado"          # observar | supervisionado | liberado
-provedor = "groq"                # para voltar ao Claude: provedor = "anthropic" e modelo = "claude-sonnet-5-5" | groq | openai | anthropic | gemini | openrouter | xai | ollama
+provedor = "claude-code"         # 09/11/2026: Claude pela assinatura (Groq vira socorro) | para voltar ao Claude: provedor = "anthropic" e modelo = "claude-sonnet-5-5" | groq | openai | anthropic | gemini | openrouter | xai | ollama
 modelo = ""                      # vazio = padrão do provedor; para OpenAI/Gemini/xAI/OpenRouter/Ollama preencha (veja a lista do dia)
 porta = 8765
 limite_diario_usd = 0.20         # teto de US$ 5/mês ÷ ~25 dias; o teto real fica no Console da Anthropic
