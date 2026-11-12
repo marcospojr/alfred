@@ -1,5 +1,5 @@
 # Fechamento do dia. Roda sozinha em modo "observar" (só lê) e chega no Telegram.
-ativa = true
+ativa = false
 hora = "18:00"
 dias = ["seg", "ter", "qua", "qui", "sex", "sab"]
 pedido = "Fechamento do dia: chame tarefas_listar e agenda_hoje com dias=2. Responda em tópicos curtos: 1) o que foi feito hoje; 2) o que ficou pendente (atrasadas e de hoje), com o número #; 3) compromissos de amanhã com horário. Termine perguntando se quero adiar alguma tarefa (diga o comando, por exemplo: passa a #3 pra amanhã). No máximo 12 linhas. Sem markdown."
