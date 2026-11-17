@@ -34,6 +34,22 @@ def main(argv: list[str]) -> int:
             print(f"  categoria {cat}: {n}")
         antigos = len(m.search(None, "X-GM-RAW", '"is:unread older_than:30d"')[1][0].split())
         print(f"  mais velhos que 30 dias: {antigos}")
+    if len(argv) > 2 and argv[2] == "assuntos":
+        # Lista data | remetente | assunto dos não lidos (filtro Gmail opcional no 4º argumento, ex.: "category:updates").
+        filtro = argv[3] if len(argv) > 3 else ""
+        ids = m.search(None, "X-GM-RAW", f'"is:unread {filtro}"')[1][0].split() if filtro else m.search(None, "UNSEEN")[1][0].split()
+        print(f"\n{len(ids)} não lidos {filtro}:")
+        for i in range(0, len(ids), 200):
+            _, dados = m.fetch(b",".join(ids[i:i + 200]), "(BODY.PEEK[HEADER.FIELDS (FROM SUBJECT DATE)])")
+            for parte in dados:
+                if isinstance(parte, tuple):
+                    cab = {}
+                    for linha in re.split(r"\r?\n(?=\S)", parte[1].decode("utf-8", "replace").strip()):
+                        k, _, v = linha.partition(":")
+                        cab[k.strip().lower()] = _dec(re.sub(r"\s+", " ", v).strip())
+                    print(f"  {cab.get('date', '')[:16]} | {parseaddr(cab.get('from', ''))[1]} | {cab.get('subject', '')[:90]}")
+        m.logout()
+        return 0
     ids = m.search(None, "UNSEEN")[1][0].split()
     remet = Counter()
     for i in range(0, len(ids), 200):
